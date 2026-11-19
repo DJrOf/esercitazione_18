@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/movie.dart';
 import '../viewmodels/movie_view_model.dart';
-import 'movie_form_view.dart';
+import 'components/movie_form_dialog.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -22,11 +22,10 @@ class _HomeViewState extends State<HomeView> {
     super.dispose();
   }
 
-  Future<void> _openForm({Movie? movie}) async {
-    await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => MovieFormView(movie: movie),
-      ),
+  void _openForm({Movie? movie}) {
+    showDialog(
+      context: context,
+      builder: (_) => MovieFormDialog(movie: movie),
     );
   }
 
@@ -145,7 +144,12 @@ class _HomeViewState extends State<HomeView> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _openForm(),
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (_) => const MovieFormDialog(),
+          );
+        },
         child: const Icon(Icons.add),
       ),
     );
