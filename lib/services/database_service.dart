@@ -20,7 +20,7 @@ class DatabaseService {
     final documentsDirectory = await getApplicationDocumentsDirectory();
     final path = join(documentsDirectory.path, 'movies.db');
 
-    return openDatabase(
+    return await openDatabase(
       path,
       version: 1,
       onCreate: _onCreate,
@@ -41,7 +41,9 @@ class DatabaseService {
 
   Future<int> insertMovie(Movie movie) async {
     final db = await database;
-    return db.insert('film', movie.toMap());
+    return db.insert('film', 
+    movie.toMap(), 
+    conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<List<Movie>> getMovies() async {

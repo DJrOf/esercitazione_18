@@ -7,20 +7,23 @@ class MovieViewModel extends ChangeNotifier {
   final DatabaseService _databaseService = DatabaseService.instance;
 
   List<Movie> _movies = [];
+  List<Movie> _filteredMovies = [];
   bool _isLoading = false;
   String? _error;
 
   List<Movie> get movies => _movies;
+  List<Movie> get filteredMovies => _filteredMovies;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  Future<void> loadMovies() async {
+  Future<void> fecthMovies() async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
       _movies = await _databaseService.getMovies();
+      _filteredMovies = List.from(_movies);
     } catch (e) {
       _error = 'Errore nel caricamento dei film: $e';
     } finally {
@@ -29,10 +32,25 @@ class MovieViewModel extends ChangeNotifier {
     }
   }
 
+  void filterMovies(String query) {
+    if (query.isEmpty) {
+      _filteredMovies = List.from(_movies);
+    } else {
+      _filteredMovies = _movies
+          .where(
+            (movie) =>
+                movie.title.toLowerCase().contains(query.toLowerCase()) ||
+                movie.plot.toLowerCase().contains(query.toLowerCase()),
+          )
+          .toList();
+    }
+    notifyListeners();
+  }
+
   Future<bool> addMovie(Movie movie) async {
     try {
       await _databaseService.insertMovie(movie);
-      await loadMovies();
+      await fecthMovies();
       return true;
     } catch (e) {
       _error = 'Errore durante l\'inserimento: $e';
@@ -44,7 +62,7 @@ class MovieViewModel extends ChangeNotifier {
   Future<bool> updateMovie(Movie movie) async {
     try {
       await _databaseService.updateMovie(movie);
-      await loadMovies();
+      await fecthMovies();
       return true;
     } catch (e) {
       _error = 'Errore durante l\'aggiornamento: $e';
@@ -56,7 +74,7 @@ class MovieViewModel extends ChangeNotifier {
   Future<bool> deleteMovie(int id) async {
     try {
       await _databaseService.deleteMovie(id);
-      await loadMovies();
+      await fecthMovies();
       return true;
     } catch (e) {
       _error = 'Errore durante l\'eliminazione: $e';
