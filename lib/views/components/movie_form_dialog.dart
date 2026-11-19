@@ -65,64 +65,46 @@ class _MovieFormDialogState extends State<MovieFormDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final isEditing = widget.movie != null;
-
     return AlertDialog(
-      title: Text(isEditing ? 'Modifica film' : 'Nuovo film'),
-      content: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
+      title: Text(widget.movie == null ? 'Aggiungi film' : 'modifica film'),
+      content: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             children: [
               TextFormField(
                 controller: _titleController,
                 decoration: const InputDecoration(labelText: 'Titolo'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Inserisci il titolo';
-                  }
-                  return null;
-                },
+                validator: (value) => value == null || value.isEmpty
+                    ? 'campo obbligatorio'
+                    : null,
               ),
               TextFormField(
                 controller: _durationController,
-                decoration: const InputDecoration(labelText: 'Durata'),
+                decoration:
+                    const InputDecoration(labelText: 'durata in minuti'),
                 keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Inserisci la durata';
-                  }
-                  if (int.tryParse(value) == null) {
-                    return 'Numero non valido';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _yearController,
-                decoration: const InputDecoration(labelText: 'Anno'),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Inserisci l\'anno';
-                  }
-                  if (int.tryParse(value) == null) {
-                    return 'Numero non valido';
-                  }
-                  return null;
-                },
+                validator: (value) =>
+                    value == null || int.tryParse(value) == null
+                        ? 'inserisci un numero'
+                        : null,
               ),
               TextFormField(
                 controller: _plotController,
-                decoration: const InputDecoration(labelText: 'Trama'),
-                maxLines: 3,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Inserisci la trama';
-                  }
-                  return null;
-                },
+                decoration: const InputDecoration(labelText: 'trama'),
+                validator: (value) => value == null || value.isEmpty
+                    ? 'trama obbligatoria'
+                    : null,
+              ),
+              TextFormField(
+                controller: _yearController,
+                decoration:
+                    const InputDecoration(labelText: 'anno di uscita'),
+                keyboardType: TextInputType.number,
+                validator: (value) =>
+                    value == null || int.tryParse(value) == null
+                        ? 'inserisci un anno valido'
+                        : null,
               ),
             ],
           ),
@@ -131,11 +113,11 @@ class _MovieFormDialogState extends State<MovieFormDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Annulla'),
+          child: const Text('Anulla'),
         ),
-        FilledButton(
+        ElevatedButton(
           onPressed: _submitForm,
-          child: Text(isEditing ? 'Salva' : 'Aggiungi'),
+          child: const Text('Salva'),
         ),
       ],
     );
